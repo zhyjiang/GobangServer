@@ -8,6 +8,8 @@
 #include <QtNetwork/QTcpSocket>
 #include <QtNetwork/QHostAddress>
 
+class Gobang;
+
 class NetworkServer : public QObject
 {
     Q_OBJECT
@@ -29,6 +31,7 @@ private slots:
 private:
     QTcpServer  *listenSocket;
     QTcpSocket  *readWriteSocket;
+    friend class Gobang;
 };
 
 #endif // NETWORKSERVER_H

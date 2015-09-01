@@ -63,7 +63,8 @@ void Gobang::paintEvent(QPaintEvent *)
 void Gobang::mousePressEvent(QMouseEvent *event)
 {
     int x, y;
-    if(event->x() >= 20 && event->x() < 40 + m_size*30 && event->y() >= 20 && event->y() < 40 + m_size*30)
+    if(event->x() >= 20 && event->x() < 40 + m_size*30 && event->y() >= 20 && event->y() < 40 + m_size*30 &&
+            m_server.readWriteSocket->state() == QAbstractSocket::ConnectedState)
     {
         if(m_step.size() > 0)
             if(m_step.back().camp == m_camp)

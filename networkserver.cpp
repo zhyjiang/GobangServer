@@ -6,7 +6,7 @@
 NetworkServer::NetworkServer(QObject *parent):
     QObject(parent)
 {
-
+    readWriteSocket = new QTcpSocket;
 }
 
 NetworkServer::~NetworkServer()
@@ -47,25 +47,28 @@ void NetworkServer::recvMessage()
 
 void NetworkServer::sendMessage(int state, Step step)
 {
-    QByteArray array;
-    array.clear();
-    switch (state)
+    if(readWriteSocket->state() == QAbstractSocket::ConnectedState)
     {
-        case 1:
+        QByteArray array;
+        array.clear();
+        switch (state)
         {
-            QByteArray datagram;
-            datagram.clear();
-            QDataStream out(&datagram,QIODevice::WriteOnly);
-            out.setVersion(QDataStream::Qt_4_3);
-            out << 1 << step.x << step.y << step.camp;
-            readWriteSocket->write(datagram);
+            case 1:
+            {
+                QByteArray datagram;
+                datagram.clear();
+                QDataStream out(&datagram,QIODevice::WriteOnly);
+                out.setVersion(QDataStream::Qt_4_3);
+                out << 1 << step.x << step.y << step.camp;
+                readWriteSocket->write(datagram);
+            }
         }
     }
 }
 
 void NetworkServer::connectHost()
 {
-    this->readWriteSocket = new QTcpSocket;
-    this->readWriteSocket->connectToHost(QHostAddress("59.66.131.143"),8888);
+    readWriteSocket = new QTcpSocket;
+    readWriteSocket->connectToHost(QHostAddress("59.66.131.143"),8888);
     connect(readWriteSocket,SIGNAL(readyRead()),this,SLOT(recvMessage()));
 }
