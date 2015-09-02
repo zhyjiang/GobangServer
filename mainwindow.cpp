@@ -21,6 +21,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_stack->setCurrentWidget(m_startMenu);
     m_server.listen();
     m_server.getIP();
+    m_waitWidget->ui->ipLabel->setText("您的IP是:" + m_server.Sadress);
     m_timer.setInterval(1000);
     m_timer.start();
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(checkUnactive()));
@@ -46,9 +47,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(m_gobang, SIGNAL(setPiece(int, Step)), &m_server, SLOT(sendMessage(int, Step)));
     connect(&m_server, SIGNAL(setPieces(Step)), m_gobang, SLOT(setPieces(const Step&)));
     connect(&m_server, SIGNAL(findPlayer(QString)), this, SLOT(findPlayer(QString)));
-    connect(m_server.readWriteSocket, SIGNAL(connected()), this, SLOT(setGobang()));
-    connect(m_server.readWriteSocket, SIGNAL(connected()), &m_server, SLOT(closeWrite()));
-    connect(m_server.readWriteSocket, SIGNAL(connected()), &m_server, SLOT(closeListen()));
+    connect(m_server.listenSocket, SIGNAL(newConnection()), this, SLOT(setGobang()));
+    connect(m_server.listenSocket, SIGNAL(newConnection()), &m_server, SLOT(closeWrite()));
+    connect(m_server.listenSocket, SIGNAL(newConnection()), &m_server, SLOT(closeListen()));
 
     m_stack->show();
 }
@@ -67,7 +68,6 @@ void MainWindow::setWaiting()
 
 void MainWindow::setGobang()
 {
-    qDebug() << 1;
     m_stack->setCurrentWidget(m_gobang);
     m_timer.stop();
 }
@@ -98,7 +98,7 @@ void MainWindow::findPlayer(QString IP)
         }
         count++;
     }
-    if(!flag/* && ip != m_server.Sadress*/)
+    if(!flag && ip != m_server.Sadress)
     {
         m_nameList.push_back(name);
         m_ipList.push_back(ip);
@@ -146,4 +146,8 @@ void MainWindow::connectHost()
 {
     if(m_startMenu->currentIp.size() > 0)
         m_server.connectHost(m_startMenu->currentIp);
+    else
+    {
+
+    }
 }

@@ -88,6 +88,19 @@
     <string>请稍等片刻……</string>
    </property>
   </widget>
+  <widget class="QLabel" name="ipLabel">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>280</y>
+     <width>211</width>
+     <height>71</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>您的IP是：</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>

@@ -9,6 +9,7 @@ NetworkServer::NetworkServer(QObject *parent):
     QObject(parent)
 {
     readWriteSocket = new QTcpSocket(this);
+    listenSocket = new QTcpServer(this);
     SudpSocket = new QUdpSocket(this);
     LudpSocket = new QUdpSocket(this);
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(broadcast()));
@@ -25,7 +26,6 @@ NetworkServer::~NetworkServer()
 
 void NetworkServer::initServer()
 {
-    listenSocket = new QTcpServer;
     listenSocket->listen(QHostAddress::Any,8888);
     connect(listenSocket, SIGNAL(newConnection()), this, SLOT(acceptConnection()));
 }
@@ -76,7 +76,6 @@ void NetworkServer::sendMessage(int state, Step step)
 
 void NetworkServer::connectHost(QString ip)
 {
-    readWriteSocket = new QTcpSocket;
     readWriteSocket->connectToHost(QHostAddress(ip),8888);
     connect(readWriteSocket,SIGNAL(readyRead()),this,SLOT(recvMessage()));
 }
@@ -102,6 +101,7 @@ void NetworkServer::broadcast()
     datagram.clear();
     datagram.append(m_name + " ");
     datagram.append(Sadress);
+    qDebug() << datagram;
     SudpSocket->writeDatagram(datagram.data(), datagram.size(), QHostAddress(Badress), 5746);
 }
 
