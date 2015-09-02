@@ -2,6 +2,7 @@
 #define STARTMENU_H
 
 #include <QWidget>
+#include <QListWidgetItem>
 
 class MainWindow;
 
@@ -17,8 +18,12 @@ public:
     explicit StartMenu(QWidget *parent = 0);
     ~StartMenu();
 
+private slots:
+    void activeItem(QListWidgetItem*);
+
 private:
     Ui::StartMenu *ui;
+    QString currentIp;
 
     friend class MainWindow;
 };

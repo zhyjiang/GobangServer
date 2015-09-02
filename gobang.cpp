@@ -8,8 +8,7 @@
 
 Gobang::Gobang(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::Gobang),
-    m_server(this)
+    ui(new Ui::Gobang)
 {
     ui->setupUi(this);
 
@@ -19,8 +18,7 @@ Gobang::Gobang(QWidget *parent) :
     m_camp = white;
     resize(40 + m_size*30, 40 + m_size*30);
 
-    connect(this, SIGNAL(setPiece(int, Step)), &m_server, SLOT(sendMessage(int, Step)));
-    connect(&m_server, SIGNAL(setPieces(Step)), this, SLOT(setPieces(const Step&)));
+
 }
 
 Gobang::~Gobang()
@@ -63,8 +61,7 @@ void Gobang::paintEvent(QPaintEvent *)
 void Gobang::mousePressEvent(QMouseEvent *event)
 {
     int x, y;
-    if(event->x() >= 20 && event->x() < 40 + m_size*30 && event->y() >= 20 && event->y() < 40 + m_size*30 &&
-            m_server.readWriteSocket->state() == QAbstractSocket::ConnectedState)
+    if(event->x() >= 20 && event->x() < 40 + m_size*30 && event->y() >= 20 && event->y() < 40 + m_size*30)
     {
         if(m_step.size() > 0)
             if(m_step.back().camp == m_camp)

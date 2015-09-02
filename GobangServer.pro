@@ -19,19 +19,22 @@ SOURCES += main.cpp\
     step.cpp \
     mainwindow.cpp \
     startmenu.cpp \
-    networkserver.cpp
+    networkserver.cpp \
+    waitwidget.cpp
 
 HEADERS  += gobang.h \
     pieces.h \
     step.h \
     mainwindow.h \
     startmenu.h \
-    networkserver.h
+    networkserver.h \
+    waitwidget.h
 
 FORMS    += \
     mainwindow.ui \
     gobang.ui \
-    startmenu.ui
+    startmenu.ui \
+    waitwidget.ui
 
 RESOURCES += \
     resource.qrc

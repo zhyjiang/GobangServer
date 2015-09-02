@@ -23,7 +23,6 @@ class Gobang : public QWidget
 public:
     explicit Gobang(QWidget *parent = 0);
     ~Gobang();
-    NetworkServer* getNetworkServer() {return &m_server;}
 
 public slots:
     void setHost();
@@ -42,7 +41,6 @@ private:
 
     Ui::Gobang *ui;
     Pieces board_[20][20]; // The chessboard.
-    NetworkServer m_server;
 
     std::vector<Step> m_step;
 

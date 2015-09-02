@@ -4,11 +4,14 @@
 #include "step.h"
 
 #include <QObject>
+#include <QString>
+#include <QTimer>
 #include <QtNetwork/QTcpServer>
 #include <QtNetwork/QTcpSocket>
+#include <QtNetwork/QUdpSocket>
 #include <QtNetwork/QHostAddress>
 
-class Gobang;
+class MainWindow;
 
 class NetworkServer : public QObject
 {
@@ -20,18 +23,30 @@ public:
 
 signals:
     void setPieces(Step);
+    void findPlayer(QString);
 
 private slots:
     void initServer();
     void acceptConnection();
     void recvMessage();
     void sendMessage(int state, Step step);
-    void connectHost();
+    void connectHost(QString ip);
+    void getIP();
+    void broadcast();
+    void listen();
+    void closeListen();
+    void closeWrite();
+    void processPendingDatagrams();
 
 private:
     QTcpServer  *listenSocket;
     QTcpSocket  *readWriteSocket;
-    friend class Gobang;
+    QUdpSocket *SudpSocket, *LudpSocket;
+    QString Sadress, Badress;
+    QTimer m_timer;
+    QString m_name;
+
+    friend class MainWindow;
 };
 
 #endif // NETWORKSERVER_H
