@@ -2,6 +2,8 @@
 #include "ui_mainwindow.h"
 #include "ui_startmenu.h"
 #include "ui_waitWidget.h"
+#include "enterdialog.h"
+#include "ui_enterdialog.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -31,7 +33,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(m_startMenu->ui->startServer, SIGNAL(clicked()), &m_server, SLOT(closeListen()));
     connect(m_startMenu->ui->startServer, SIGNAL(clicked()), &m_server, SLOT(initServer()));
 
-    connect(m_startMenu->ui->startClient, SIGNAL(clicked()), this, SLOT(setGobang()));
     connect(m_startMenu->ui->startClient, SIGNAL(clicked()), this, SLOT(connectHost()));
     connect(m_startMenu->ui->startClient, SIGNAL(clicked()), &m_server, SLOT(closeListen()));
 
@@ -45,11 +46,13 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(m_waitWidget->ui->back, SIGNAL(clicked()), this, SLOT(setStart()));
 
     connect(m_gobang, SIGNAL(setPiece(int, Step)), &m_server, SLOT(sendMessage(int, Step)));
+
     connect(&m_server, SIGNAL(setPieces(Step)), m_gobang, SLOT(setPieces(const Step&)));
     connect(&m_server, SIGNAL(findPlayer(QString)), this, SLOT(findPlayer(QString)));
     connect(m_server.listenSocket, SIGNAL(newConnection()), this, SLOT(setGobang()));
     connect(m_server.listenSocket, SIGNAL(newConnection()), &m_server, SLOT(closeWrite()));
     connect(m_server.listenSocket, SIGNAL(newConnection()), &m_server, SLOT(closeListen()));
+    connect(m_server.readWriteSocket, SIGNAL(connected()), this, SLOT(setGobang()));
 
     m_stack->show();
 }
@@ -145,9 +148,13 @@ void MainWindow::checkUnactive()
 void MainWindow::connectHost()
 {
     if(m_startMenu->currentIp.size() > 0)
+    {
         m_server.connectHost(m_startMenu->currentIp);
+    }
     else
     {
-
+        enterDialog tempDialog(this);
+        connect(&tempDialog, SIGNAL(setIP(QString)), &m_server, SLOT(connectHost(QString)));
+        tempDialog.exec();
     }
 }

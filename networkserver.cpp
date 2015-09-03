@@ -18,10 +18,14 @@ NetworkServer::NetworkServer(QObject *parent):
 
 NetworkServer::~NetworkServer()
 {
-    delete listenSocket;
+    listenSocket->close();
+    readWriteSocket->close();
+    SudpSocket->close();
+    LudpSocket->close();
     delete readWriteSocket;
     delete SudpSocket;
     delete LudpSocket;
+    delete listenSocket;
 }
 
 void NetworkServer::initServer()
