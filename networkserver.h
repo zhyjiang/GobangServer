@@ -24,6 +24,13 @@ public:
 signals:
     void setPieces(Step);
     void findPlayer(QString);
+    void changeCamp(int);
+    void recall(int);
+    void reStart();
+    void changeState(int, int, int);
+    void askForRecall();
+    void isDisconnect();
+    void agreeRecall();
 
 private slots:
     void initServer();

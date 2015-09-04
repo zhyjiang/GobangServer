@@ -39,27 +39,51 @@
     <string>加入主机游戏</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="refresh">
-   <property name="geometry">
-    <rect>
-     <x>490</x>
-     <y>320</y>
-     <width>131</width>
-     <height>71</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>刷新局域网信息</string>
-   </property>
-  </widget>
   <widget class="QListWidget" name="playerList">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>40</y>
-     <width>331</width>
-     <height>331</height>
+     <x>80</x>
+     <y>100</y>
+     <width>321</width>
+     <height>181</height>
     </rect>
+   </property>
+   <property name="palette">
+    <palette>
+     <active>
+      <colorrole role="Base">
+       <brush brushstyle="SolidPattern">
+        <color alpha="100">
+         <red>255</red>
+         <green>255</green>
+         <blue>255</blue>
+        </color>
+       </brush>
+      </colorrole>
+     </active>
+     <inactive>
+      <colorrole role="Base">
+       <brush brushstyle="SolidPattern">
+        <color alpha="100">
+         <red>255</red>
+         <green>255</green>
+         <blue>255</blue>
+        </color>
+       </brush>
+      </colorrole>
+     </inactive>
+     <disabled>
+      <colorrole role="Base">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>240</red>
+         <green>240</green>
+         <blue>240</blue>
+        </color>
+       </brush>
+      </colorrole>
+     </disabled>
+    </palette>
    </property>
   </widget>
  </widget>

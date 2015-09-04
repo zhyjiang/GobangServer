@@ -20,7 +20,7 @@ enterDialog::enterDialog(QWidget *parent) :
     m_map.setMapping(dot, 10);
     connect(&m_map, SIGNAL(mapped(int)), this, SLOT(display(int)));
     for(int i = 0; i < 10; ++i)
-        ui->gridLayout->addWidget(button[i], i/7, i>6?i-6:i);
+        ui->gridLayout->addWidget(button[i], i/6, i>5?i-6:i);
     ui->gridLayout->addWidget(dot, 1, 4);
     ui->gridLayout->addWidget(del, 1, 5);
 }
@@ -45,7 +45,11 @@ void enterDialog::display(int num)
         ui->lineEdit->setText(temp);
     }
     else if(num == 11)
-        ui->lineEdit->del();
+    {
+        QString temp = ui->lineEdit->text();
+        temp.remove(temp.size()-1, 1);
+        ui->lineEdit->setText(temp);
+    }
 }
 
 void enterDialog::on_ok_clicked()

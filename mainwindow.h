@@ -7,7 +7,6 @@
 #include "waitwidget.h"
 
 #include <QMainWindow>
-#include <QStackedWidget>
 #include <QStringList>
 
 namespace Ui {
@@ -31,16 +30,18 @@ private slots:
     void connectHost();
     void checkUnactive();
     void setStart();
+    void checkState();
 
 private:
     Ui::MainWindow *ui;
     Gobang *m_gobang;
     StartMenu *m_startMenu;
-    QStackedWidget *m_stack;
     waitWidget *m_waitWidget;
+    QWidget *currentWidget;
     NetworkServer m_server;
     QString m_name;
-    QTimer m_timer;
+    QTimer m_timer, m_time1;
+    QAbstractSocket::SocketState currentState;
 
     QStringList m_ipList, m_nameList;
 

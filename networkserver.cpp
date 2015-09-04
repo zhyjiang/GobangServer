@@ -18,8 +18,9 @@ NetworkServer::NetworkServer(QObject *parent):
 
 NetworkServer::~NetworkServer()
 {
-    listenSocket->close();
+    sendMessage(9, Step(0,0,0));
     readWriteSocket->close();
+    listenSocket->close();
     SudpSocket->close();
     LudpSocket->close();
     delete readWriteSocket;
@@ -47,13 +48,50 @@ void NetworkServer::recvMessage()
     info.clear();
     info = readWriteSocket->readAll();
     QDataStream in(&info, QIODevice::ReadOnly);
-    int temp;
-    in >> temp;
-    if(temp == 1)
+    int temp = 8888;
+    while(temp == 8888)
     {
-        int x, y, camp;
-        in >> x >> y >> camp;
-        emit setPieces(Step(x, y, camp));
+        in >> temp;
+        if(temp == 1)
+        {
+            int x, y, camp;
+            in >> x >> y >> camp;
+            emit setPieces(Step(x, y, camp));
+        }
+        else if(temp == 2)
+        {
+            in >> temp;
+            emit changeCamp(temp);
+        }
+        else if(temp == 3)
+        {
+            in >> temp;
+            emit recall(temp);
+        }
+        else if(temp == 4)
+        {
+            emit reStart();
+        }
+        else if(temp == 5)
+        {
+            int camp, wbNumw, wbNumb;
+            in >> camp >> wbNumw >> wbNumb;
+            emit changeState(camp, wbNumw, wbNumb);
+        }
+        else if(temp == 6)
+        {
+            emit askForRecall();
+        }
+        else if(temp == 7)
+        {
+            emit agreeRecall();
+        }
+        else if(temp == 8)
+        {
+            readWriteSocket->abort();
+            emit isDisconnect();
+        }
+        in >> temp;
     }
 }
 
@@ -63,16 +101,59 @@ void NetworkServer::sendMessage(int state, Step step)
     {
         QByteArray array;
         array.clear();
+        QDataStream out(&array,QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_4_3);
         switch (state)
         {
             case 1:
             {
-                QByteArray datagram;
-                datagram.clear();
-                QDataStream out(&datagram,QIODevice::WriteOnly);
-                out.setVersion(QDataStream::Qt_4_3);
-                out << 1 << step.x << step.y << step.camp;
-                readWriteSocket->write(datagram);
+                out << 1 << step.x << step.y << step.camp << 8888;
+                readWriteSocket->write(array);
+                break;
+            }
+            case 2:
+            case 3:
+            {
+            qDebug() << state -1;
+                out << 2 << state-1 << 8888;
+                readWriteSocket->write(array);
+                break;
+            }
+            case 4:
+            {
+                out << 3 << step.camp << 8888;
+                readWriteSocket->write(array);
+                break;
+            }
+            case 5:
+            {
+                out << 4 << 8888;
+                readWriteSocket->write(array);
+                break;
+            }
+            case 6:
+            {
+                out << 5 << step.x << step.y << step.camp << 8888;
+                readWriteSocket->write(array);
+                break;
+            }
+            case 7:
+            {
+                out << 6 << 8888;
+                readWriteSocket->write(array);
+                break;
+            }
+            case 8:
+            {
+                out << 7 << 8888;
+                readWriteSocket->write(array);
+                break;
+            }
+            case 9:
+            {
+                out << 8 << 8888;
+                readWriteSocket->write(array);
+                break;
             }
         }
     }
@@ -80,6 +161,7 @@ void NetworkServer::sendMessage(int state, Step step)
 
 void NetworkServer::connectHost(QString ip)
 {
+    readWriteSocket->abort();
     readWriteSocket->connectToHost(QHostAddress(ip),8888);
     connect(readWriteSocket,SIGNAL(readyRead()),this,SLOT(recvMessage()));
 }

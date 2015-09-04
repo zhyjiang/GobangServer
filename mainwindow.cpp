@@ -3,7 +3,7 @@
 #include "ui_startmenu.h"
 #include "ui_waitWidget.h"
 #include "enterdialog.h"
-#include "ui_enterdialog.h"
+#include "winwidget.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -14,17 +14,18 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     m_gobang = new Gobang(this);
     m_startMenu = new StartMenu(this);
-    m_stack = new QStackedWidget(this);
-    m_waitWidget = new waitWidget;
-    setCentralWidget(m_stack);
-    m_stack->addWidget(m_waitWidget);
-    m_stack->addWidget(m_gobang);
-    m_stack->addWidget(m_startMenu);
-    m_stack->setCurrentWidget(m_startMenu);
+    m_waitWidget = new waitWidget(this);
+    m_gobang->hide();
+    m_waitWidget->hide();
+    m_startMenu->show();
+    currentWidget = m_startMenu;
     m_server.listen();
     m_server.getIP();
     m_waitWidget->ui->ipLabel->setText("您的IP是:" + m_server.Sadress);
     m_timer.setInterval(1000);
+    currentState = m_server.readWriteSocket->state();
+    m_time1.setInterval(1000); m_time1.start();
+    connect(&m_time1, SIGNAL(timeout()), this, SLOT(checkState()));
     m_timer.start();
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(checkUnactive()));
 
@@ -36,8 +37,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(m_startMenu->ui->startClient, SIGNAL(clicked()), this, SLOT(connectHost()));
     connect(m_startMenu->ui->startClient, SIGNAL(clicked()), &m_server, SLOT(closeListen()));
 
-    connect(m_startMenu->ui->refresh, SIGNAL(clicked()), this, SLOT(refresh()));
-
     connect(m_waitWidget->ui->ok, SIGNAL(clicked()), this, SLOT(broadcast()));
     connect(m_waitWidget->ui->ok, SIGNAL(clicked()), m_waitWidget->ui->setBox, SLOT(hide()));
     connect(m_waitWidget->ui->ok, SIGNAL(clicked()), m_waitWidget->ui->waitLabel, SLOT(show()));
@@ -46,15 +45,25 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(m_waitWidget->ui->back, SIGNAL(clicked()), this, SLOT(setStart()));
 
     connect(m_gobang, SIGNAL(setPiece(int, Step)), &m_server, SLOT(sendMessage(int, Step)));
+    connect(m_gobang, SIGNAL(timeOut(int, Step)), &m_server, SLOT(sendMessage(int,Step)));
+    connect(m_gobang, SIGNAL(recall(int, Step)), &m_server, SLOT(sendMessage(int,Step)));
+    connect(m_gobang, SIGNAL(reStartGame(int, Step)), &m_server, SLOT(sendMessage(int,Step)));
+    connect(m_gobang, SIGNAL(changeState(int,Step)), &m_server, SLOT(sendMessage(int,Step)));
+    connect(m_gobang, SIGNAL(askForRecall(int, Step)), &m_server, SLOT(sendMessage(int,Step)));
+    connect(m_gobang, SIGNAL(isAgreeRecall(int, Step)), &m_server, SLOT(sendMessage(int,Step)));
 
     connect(&m_server, SIGNAL(setPieces(Step)), m_gobang, SLOT(setPieces(const Step&)));
     connect(&m_server, SIGNAL(findPlayer(QString)), this, SLOT(findPlayer(QString)));
+    connect(&m_server, SIGNAL(changeCamp(int)), m_gobang, SLOT(changeCamp(int)));
+    connect(&m_server, SIGNAL(recall(int)), m_gobang, SLOT(recallDone(int)));
+    connect(&m_server, SIGNAL(reStart()), m_gobang, SLOT(reStart()));
+    connect(&m_server, SIGNAL(agreeRecall()), m_gobang, SLOT(on_recall()));
+    connect(&m_server, SIGNAL(askForRecall()), m_gobang, SLOT(forRecall()));
+    connect(&m_server, SIGNAL(changeState(int, int, int)), m_gobang, SLOT(changeCurrentState(int, int, int)));
     connect(m_server.listenSocket, SIGNAL(newConnection()), this, SLOT(setGobang()));
     connect(m_server.listenSocket, SIGNAL(newConnection()), &m_server, SLOT(closeWrite()));
     connect(m_server.listenSocket, SIGNAL(newConnection()), &m_server, SLOT(closeListen()));
     connect(m_server.readWriteSocket, SIGNAL(connected()), this, SLOT(setGobang()));
-
-    m_stack->show();
 }
 
 MainWindow::~MainWindow()
@@ -64,23 +73,42 @@ MainWindow::~MainWindow()
 
 void MainWindow::setWaiting()
 {
-    m_stack->setCurrentWidget(m_waitWidget);
+    currentWidget->hide();
+    m_waitWidget->show();
+    currentWidget = m_waitWidget;
     if(m_name.size() > 0)
         broadcast();
 }
 
 void MainWindow::setGobang()
 {
-    m_stack->setCurrentWidget(m_gobang);
+    currentWidget->hide();
+    m_gobang->show();
+    m_gobang->m_timer.start();
+    currentWidget = m_gobang;
     m_timer.stop();
 }
 
 void MainWindow::setStart()
 {
-    m_stack->setCurrentWidget(m_startMenu);
-        qDebug() << 1;
-    m_gobang->m_host = false;
-    m_gobang->m_camp = Gobang::white;
+    currentWidget->hide();
+    m_startMenu->show();
+    currentWidget = m_startMenu;
+    delete m_gobang;
+    m_gobang = new Gobang(this);
+    m_gobang->hide();
+}
+
+void MainWindow::checkState()
+{
+    if(currentState == QAbstractSocket::ConnectedState &&
+            m_server.readWriteSocket->state() == QAbstractSocket::UnconnectedState)
+    {
+        setStart();
+        WinWidget *win = new WinWidget(WinWidget::disconnect, this);
+        win->show();
+    }
+    currentState = m_server.readWriteSocket->state();
 }
 
 void MainWindow::findPlayer(QString IP)
@@ -106,6 +134,7 @@ void MainWindow::findPlayer(QString IP)
         m_nameList.push_back(name);
         m_ipList.push_back(ip);
         m_waitList.push_back(3);
+        refresh();
     }
 }
 
@@ -137,16 +166,17 @@ void MainWindow::checkUnactive()
         m_waitList[i]--;
         if(m_waitList[i] == -1)
         {
-            qDebug() << i;
             m_waitList.removeAt(i);
             m_ipList.removeAt(i);
             m_nameList.removeAt(i);
+            refresh();
         }
     }
 }
 
 void MainWindow::connectHost()
 {
+    m_gobang->m_camp = Gobang::white;
     if(m_startMenu->currentIp.size() > 0)
     {
         m_server.connectHost(m_startMenu->currentIp);

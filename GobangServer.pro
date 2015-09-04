@@ -21,7 +21,8 @@ SOURCES += main.cpp\
     startmenu.cpp \
     networkserver.cpp \
     waitwidget.cpp \
-    enterdialog.cpp
+    enterdialog.cpp \
+    winwidget.cpp
 
 HEADERS  += gobang.h \
     pieces.h \
@@ -30,14 +31,16 @@ HEADERS  += gobang.h \
     startmenu.h \
     networkserver.h \
     waitwidget.h \
-    enterdialog.h
+    enterdialog.h \
+    winwidget.h
 
 FORMS    += \
     mainwindow.ui \
     gobang.ui \
     startmenu.ui \
     waitwidget.ui \
-    enterdialog.ui
+    enterdialog.ui \
+    winwidget.ui
 
 RESOURCES += \
     resource.qrc
