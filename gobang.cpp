@@ -66,7 +66,7 @@ void Gobang::mousePressEvent(QMouseEvent *event)
         if(!setPieces(Step(x, y, m_camp)))
             return;
         turn++;
-        emit sendSignal(1, Step(x, y, m_camp));
+        emit setPiece(1, Step(x, y, m_camp));
     }
 }
 
@@ -189,7 +189,7 @@ void Gobang::timeOut()
     if(timeCount == 80 && m_host == true)
     {
         currentCamp = 3 - currentCamp;
-        emit sendSignal(currentCamp+1, Step(0, 0, 0));
+        emit timeOut(currentCamp+1, Step(0, 0, 0));
         if(currentCamp == m_camp)
             ui->currentCamp->setText("请您落子");
         else
@@ -212,7 +212,7 @@ void Gobang::on_recall_clicked()
 {
     if(m_step.size() > 0 && wbStep[m_camp-1] > 0)
     {
-        emit sendSignal(7, Step(0,0,0));
+        emit askForRecall(7, Step(0,0,0));
         WinWidget *win = new WinWidget(WinWidget::waitForRecall, this);
         connect(this, SIGNAL(haveAgreed()), &win->time, SLOT(start()));
         connect(this, SIGNAL(haveAgreed()), win, SLOT(deleteLater()));
@@ -243,7 +243,7 @@ void Gobang::on_recall()
         m_step.pop_back();
     }
     m_plat.update();
-    emit sendSignal(4, Step(0, 0, m_camp));
+    emit recall(4, Step(0, 0, m_camp));
 }
 
 void Gobang::forRecall()
@@ -272,12 +272,12 @@ void Gobang::forExit()
 
 void Gobang::agreeRecall()
 {
-    emit sendSignal(8, Step(0,0,0));
+    emit isAgreeRecall(8, Step(0,0,0));
 }
 
 void Gobang::agreeExit()
 {
-    emit sendSignal(10, Step(0, 0, 0));
+    emit isAgreeExit(10, Step(0, 0, 0));
 }
 
 void Gobang::changeCurrentState(int camp, int wbNumw, int wbNumb)
@@ -362,11 +362,11 @@ void Gobang::on_load_clicked()
             m_step.push_back(Step(x, y, camp));
             setPieces(m_step.back());
         }
-        emit sendSignal(5, Step(0, 0, 0));
+        emit reStartGame(5, Step(0, 0, 0));
         m_plat.update();
         for(int i = 0; i < (int)m_step.size(); ++i)
-            emit sendSignal(1, m_step[i]);
-        emit sendSignal(6, Step(temp1, temp2, temp3));
+            emit setPiece(1, m_step[i]);
+        emit changeState(6, Step(temp1, temp2, temp3));
         currentCamp = temp1;
         wbStep[0] = temp2;
         wbStep[1] = temp3;
@@ -375,7 +375,7 @@ void Gobang::on_load_clicked()
 
 void Gobang::on_back_click()
 {
-    emit sendSignal(9, Step(0,0,0));
+    emit askForExit(9, Step(0,0,0));
     WinWidget *win = new WinWidget(WinWidget::waitForExit, this);
     connect(win, SIGNAL(isClosed(bool)), &m_timer, SLOT(start()));
     connect(this, SIGNAL(haveExited()), win, SLOT(deleteLater()));

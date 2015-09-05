@@ -44,15 +44,24 @@ public slots:
     void changePress() {m_noPress = false;}
     void on_back_click();
     void on_exit() {emit haveExited();}
-    void refuse() {emit sendSignal(11, Step(0,0,0));}
+    void refuse() {emit haveRefused(11, Step(0,0,0));}
     void on_refuse() {emit isRefused();}
 
 signals:
     void haveAgreed();
-    void sendSignal(int, Step);
+    void setPiece(int, Step);
     void win(int);
+    void timeOut(int, Step);
+    void recall(int, Step);
+    void reStartGame(int, Step);
+    void changeState(int, Step);
+    void askForRecall(int, Step);
+    void isAgreeRecall(int, Step);
+    void askForExit(int, Step);
+    void isAgreeExit(int, Step);
     void haveExited();
     void isRefused();
+    void haveRefused(int, Step);
 
 private slots:
     void on_recall_clicked();

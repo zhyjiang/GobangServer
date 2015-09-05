@@ -128,8 +128,6 @@ WinWidget::WinWidget(int _type, QWidget *parent) :
         {
             ui->saveLabel->hide();
             ui->saveEdit->hide();
-            ui->refuse->hide();
-            ui->pushButton->hide();
             QPixmap temp(":/Pic/GobangUi/waitRespond.png");
             ui->label->setGeometry(QRect(100, 100, temp.width()*0.6, temp.height()*0.6));
             ui->label->setPixmap(temp);
@@ -160,7 +158,7 @@ void WinWidget::paintEvent(QPaintEvent *)
 
 void WinWidget::saveGame()
 {
-    emit saveFile(ui->saveEdit->text()==""?"Untitled":ui->saveEdit->text());
+    emit saveFile(ui->saveEdit->text());
 }
 
 void WinWidget::agree()
