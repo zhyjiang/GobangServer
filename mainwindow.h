@@ -8,6 +8,7 @@
 
 #include <QMainWindow>
 #include <QStringList>
+#include <QMediaPlayer>
 
 namespace Ui {
 class MainWindow;
@@ -38,10 +39,11 @@ private:
     StartMenu *m_startMenu;
     waitWidget *m_waitWidget;
     QWidget *currentWidget;
-    NetworkServer m_server;
+    NetworkServer *m_server;
     QString m_name;
     QTimer m_timer, m_time1;
     QAbstractSocket::SocketState currentState;
+    QMediaPlayer m_bgm;
 
     QStringList m_ipList, m_nameList;
 

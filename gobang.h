@@ -4,10 +4,12 @@
 #include "pieces.h"
 #include "step.h"
 #include "networkserver.h"
+#include "gobangplat.h"
 
 #include <QPaintEvent>
 #include <QWidget>
 #include <QTimer>
+#include <QSound>
 
 #include <vector>
 
@@ -36,10 +38,17 @@ public slots:
     void saveGame(QString);
     void on_recall();
     void forRecall();
+    void forExit();
     void agreeRecall();
+    void agreeExit();
     void changePress() {m_noPress = false;}
+    void on_back_click();
+    void on_exit() {emit haveExited();}
+    void refuse() {emit haveRefused(11, Step(0,0,0));}
+    void on_refuse() {emit isRefused();}
 
 signals:
+    void haveAgreed();
     void setPiece(int, Step);
     void win(int);
     void timeOut(int, Step);
@@ -48,6 +57,11 @@ signals:
     void changeState(int, Step);
     void askForRecall(int, Step);
     void isAgreeRecall(int, Step);
+    void askForExit(int, Step);
+    void isAgreeExit(int, Step);
+    void haveExited();
+    void isRefused();
+    void haveRefused(int, Step);
 
 private slots:
     void on_recall_clicked();
@@ -58,12 +72,13 @@ private slots:
 private:
     int turnAdd() {return turn++;}
     int checkWin(); // To check whether there is a winner or not.
-    void paintEvent(QPaintEvent *);
     void mousePressEvent(QMouseEvent *);
 
     Ui::Gobang *ui;
     Pieces board_[20][20]; // The chessboard.
     QTimer m_timer;
+    GobangPlat m_plat;
+    QSound m_setPiece, m_win, m_lose;
 
     std::vector<Step> m_step;
 

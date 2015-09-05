@@ -17,10 +17,15 @@
    <property name="geometry">
     <rect>
      <x>530</x>
-     <y>80</y>
+     <y>100</y>
      <width>101</width>
      <height>41</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>16</pointsize>
+    </font>
    </property>
    <property name="text">
     <string>0</string>
@@ -30,9 +35,9 @@
    <property name="geometry">
     <rect>
      <x>530</x>
-     <y>160</y>
-     <width>75</width>
-     <height>23</height>
+     <y>170</y>
+     <width>81</width>
+     <height>31</height>
     </rect>
    </property>
    <property name="text">
@@ -44,8 +49,8 @@
     <rect>
      <x>530</x>
      <y>230</y>
-     <width>75</width>
-     <height>23</height>
+     <width>81</width>
+     <height>31</height>
     </rect>
    </property>
    <property name="text">
@@ -57,8 +62,8 @@
     <rect>
      <x>530</x>
      <y>290</y>
-     <width>75</width>
-     <height>23</height>
+     <width>81</width>
+     <height>31</height>
     </rect>
    </property>
    <property name="text">
@@ -69,7 +74,7 @@
    <property name="geometry">
     <rect>
      <x>530</x>
-     <y>30</y>
+     <y>40</y>
      <width>121</width>
      <height>41</height>
     </rect>
@@ -78,7 +83,41 @@
     <string/>
    </property>
   </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>20</y>
+     <width>460</width>
+     <height>462</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="resource.qrc">:/Pic/plat.png</pixmap>
+   </property>
+   <property name="scaledContents">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="back">
+   <property name="geometry">
+    <rect>
+     <x>530</x>
+     <y>350</y>
+     <width>81</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>退出</string>
+   </property>
+  </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="resource.qrc"/>
+ </resources>
  <connections/>
 </ui>

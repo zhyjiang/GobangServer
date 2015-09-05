@@ -29,8 +29,10 @@ signals:
     void reStart();
     void changeState(int, int, int);
     void askForRecall();
-    void isDisconnect();
     void agreeRecall();
+    void agreeExit();
+    void askForExit();
+    void refuse();
 
 private slots:
     void initServer();

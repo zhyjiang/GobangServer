@@ -12,6 +12,7 @@ enterDialog::enterDialog(QWidget *parent) :
         connect(button[i], SIGNAL(clicked()), &m_map, SLOT(map()));
         m_map.setMapping(button[i], i);
     }
+    setWindowTitle("请输入对方的IP");
     del = new QPushButton("del", this);
     connect(del, SIGNAL(clicked()), &m_map, SLOT(map()));
     m_map.setMapping(del, 11);

@@ -5,7 +5,7 @@
 #-------------------------------------------------
 
 QT       += core gui
-QT       += network
+QT       += network multimedia
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -22,7 +22,8 @@ SOURCES += main.cpp\
     networkserver.cpp \
     waitwidget.cpp \
     enterdialog.cpp \
-    winwidget.cpp
+    winwidget.cpp \
+    gobangplat.cpp
 
 HEADERS  += gobang.h \
     pieces.h \
@@ -32,7 +33,8 @@ HEADERS  += gobang.h \
     networkserver.h \
     waitwidget.h \
     enterdialog.h \
-    winwidget.h
+    winwidget.h \
+    gobangplat.h
 
 FORMS    += \
     mainwindow.ui \
@@ -44,3 +46,5 @@ FORMS    += \
 
 RESOURCES += \
     resource.qrc
+
+RC_ICONS = Icon.ico

@@ -3,6 +3,7 @@
 
 class Gobang;
 class NetworkServer;
+class GobangPlat;
 
 class Step //The class save the data of the player's step.
 {
@@ -11,6 +12,7 @@ private:
     int y;
     int camp;
     friend class Gobang;
+    friend class GobangPlat;
     friend class NetworkServer;
 public:
     Step(int _x, int _y, int _camp);

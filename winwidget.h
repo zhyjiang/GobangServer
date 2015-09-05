@@ -18,22 +18,30 @@ class WinWidget : public QWidget
 public:
     explicit WinWidget(int _type, QWidget *parent = 0);
     ~WinWidget();
-    enum {win, save, load, recall, disconnect};
+    enum {win, save, load, recall, disconnect, waitForRecall, waitForExit, exit};
 
 private slots:
     void saveGame();
     void agree();
+    void thicker();
+    void thinner();
+    void isAgreeExit();
+    void refuse();
 
 signals:
     void saveFile(QString);
     void isClosed(bool);
     void agreeRecall();
+    void agreeExit();
+    void haveRefused();
 
 private:
     void paintEvent(QPaintEvent *);
     Ui::WinWidget *ui;
     QGraphicsOpacityEffect m_effect;
     QTimer time;
+
+    double m_opacity;
 
     friend class Gobang;
 };

@@ -1,2 +1,27 @@
-<RCC/>
-
+<RCC>
+    <qresource prefix="/Pic">
+        <file>plat.png</file>
+        <file>backgroud.png</file>
+        <file>title.png</file>
+        <file>GobangUi/waitGame.png</file>
+        <file>GobangUi/chinaz8.png</file>
+        <file>GobangUi/recall.png</file>
+        <file>GobangUi/chinaz258.png</file>
+        <file>GobangUi/chinaz259.png</file>
+        <file>GobangUi/disconnect.png</file>
+        <file>GobangUi/load.png</file>
+        <file>GobangUi/loadIcon.png</file>
+        <file>GobangUi/save.png</file>
+        <file>GobangUi/saveIcon.png</file>
+        <file>GobangUi/saveLabel.png</file>
+        <file>GobangUi/wait.png</file>
+        <file>GobangUi/lose.png</file>
+        <file>GobangUi/win.png</file>
+        <file>GobangUi/EARST_20070731B_PNG03.png</file>
+        <file>GobangUi/waitRespond.png</file>
+        <file>GobangUi/EARST_20070731B_PNG33.png</file>
+        <file>GobangUi/exit.png</file>
+        <file>arrows.png</file>
+        <file>GobangUi/enter.png</file>
+    </qresource>
+</RCC>

@@ -1,6 +1,7 @@
 #include "networkserver.h"
 #include <QDebug>
 #include <QDataStream>
+#include <QHostInfo>
 #include <QNetworkInterface>
 #include <QNetworkAddressEntry>
 #include <QString>
@@ -13,6 +14,8 @@ NetworkServer::NetworkServer(QObject *parent):
     SudpSocket = new QUdpSocket(this);
     LudpSocket = new QUdpSocket(this);
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(broadcast()));
+    connect(listenSocket, SIGNAL(newConnection()), this, SLOT(acceptConnection()));
+    connect(LudpSocket, SIGNAL(readyRead()),this, SLOT(processPendingDatagrams()));
     m_timer.setInterval(1000);
 }
 
@@ -31,8 +34,10 @@ NetworkServer::~NetworkServer()
 
 void NetworkServer::initServer()
 {
-    listenSocket->listen(QHostAddress::Any,8888);
-    connect(listenSocket, SIGNAL(newConnection()), this, SLOT(acceptConnection()));
+    if(!listenSocket->isListening())
+    {
+        listenSocket->listen(QHostAddress::Any,8888);
+    }
 }
 
 void NetworkServer::acceptConnection()
@@ -88,8 +93,15 @@ void NetworkServer::recvMessage()
         }
         else if(temp == 8)
         {
-            readWriteSocket->abort();
-            emit isDisconnect();
+            emit askForExit();
+        }
+        else if(temp == 9)
+        {
+            emit agreeExit();
+        }
+        else if(temp == 10)
+        {
+            emit refuse();
         }
         in >> temp;
     }
@@ -114,7 +126,6 @@ void NetworkServer::sendMessage(int state, Step step)
             case 2:
             case 3:
             {
-            qDebug() << state -1;
                 out << 2 << state-1 << 8888;
                 readWriteSocket->write(array);
                 break;
@@ -155,29 +166,38 @@ void NetworkServer::sendMessage(int state, Step step)
                 readWriteSocket->write(array);
                 break;
             }
+            case 10:
+            {
+                out << 9 << 8888;
+                readWriteSocket->write(array);
+                break;
+            }
+            case 11:
+            {
+                out << 10 << 8888;
+                readWriteSocket->write(array);
+                break;
+            }
         }
     }
 }
 
 void NetworkServer::connectHost(QString ip)
 {
-    readWriteSocket->abort();
+    readWriteSocket->disconnectFromHost();
     readWriteSocket->connectToHost(QHostAddress(ip),8888);
-    connect(readWriteSocket,SIGNAL(readyRead()),this,SLOT(recvMessage()));
+    connect(readWriteSocket, SIGNAL(readyRead()), this, SLOT(recvMessage()));
 }
 
 void NetworkServer::getIP()
 {
-    QList<QNetworkInterface> list = QNetworkInterface::allInterfaces();
-    foreach(QNetworkInterface temp, list)
+    QHostInfo info = QHostInfo::fromName(QHostInfo::localHostName());
+    foreach(QHostAddress address, info.addresses())
     {
-        QList<QNetworkAddressEntry> entryList = temp.addressEntries();
-        foreach (QNetworkAddressEntry entry, entryList)
-            if(!entry.ip().toString().contains("127.0.") && entry.ip().protocol() == QAbstractSocket::IPv4Protocol)
-            {
-                Sadress = entry.ip().toString();
-                Badress = entry.broadcast().toString();
-            }
+      if(address.protocol() == QAbstractSocket::IPv4Protocol)
+      {
+         Sadress = address.toString();
+      }
     }
 }
 
@@ -187,14 +207,12 @@ void NetworkServer::broadcast()
     datagram.clear();
     datagram.append(m_name + " ");
     datagram.append(Sadress);
-    qDebug() << datagram;
-    SudpSocket->writeDatagram(datagram.data(), datagram.size(), QHostAddress(Badress), 5746);
+    SudpSocket->writeDatagram(datagram.data(), datagram.size(), QHostAddress::Broadcast, 5746);
 }
 
 void NetworkServer::listen()
 {
     LudpSocket->bind(5746, QUdpSocket::ShareAddress);
-    connect(LudpSocket, SIGNAL(readyRead()),this, SLOT(processPendingDatagrams()));
 }
 
 void NetworkServer::closeListen()
