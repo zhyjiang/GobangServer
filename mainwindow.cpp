@@ -32,7 +32,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_waitWidget->ui->ipLabel->setText("您的IP是:" + m_server->Sadress);
     m_timer.setInterval(1000);
     currentState = m_server->readWriteSocket->state();
-    m_time1.setInterval(1000); m_time1.start();
+    m_time1.setInterval(200); m_time1.start();
     connect(&m_time1, SIGNAL(timeout()), this, SLOT(checkState()));
     m_timer.start();
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(checkUnactive()));
@@ -52,16 +52,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(m_waitWidget->ui->back, SIGNAL(clicked()), m_server, SLOT(listen()));
     connect(m_waitWidget->ui->back, SIGNAL(clicked()), this, SLOT(setStart()));
 
-    connect(m_gobang, SIGNAL(setPiece(int, Step)), m_server, SLOT(sendMessage(int, Step)));
-    connect(m_gobang, SIGNAL(timeOut(int, Step)), m_server, SLOT(sendMessage(int,Step)));
-    connect(m_gobang, SIGNAL(recall(int, Step)), m_server, SLOT(sendMessage(int,Step)));
-    connect(m_gobang, SIGNAL(reStartGame(int, Step)), m_server, SLOT(sendMessage(int,Step)));
-    connect(m_gobang, SIGNAL(changeState(int,Step)), m_server, SLOT(sendMessage(int,Step)));
-    connect(m_gobang, SIGNAL(askForRecall(int, Step)), m_server, SLOT(sendMessage(int,Step)));
-    connect(m_gobang, SIGNAL(askForExit(int, Step)), m_server, SLOT(sendMessage(int,Step)));
-    connect(m_gobang, SIGNAL(isAgreeRecall(int, Step)), m_server, SLOT(sendMessage(int,Step)));
-    connect(m_gobang, SIGNAL(isAgreeExit(int, Step)), m_server, SLOT(sendMessage(int,Step)));
-    connect(m_gobang, SIGNAL(haveRefused(int, Step)), m_server, SLOT(sendMessage(int,Step)));
+    connect(m_gobang, SIGNAL(sendSignal(int, Step)), m_server, SLOT(sendMessage(int, Step)));
 
     connect(m_server, SIGNAL(setPieces(Step)), m_gobang, SLOT(setPieces(const Step&)));
     connect(m_server, SIGNAL(findPlayer(QString)), this, SLOT(findPlayer(QString)));
@@ -79,7 +70,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(m_server->listenSocket, SIGNAL(newConnection()), this, SLOT(setGobang()));
     connect(m_server->listenSocket, SIGNAL(newConnection()), m_server, SLOT(closeWrite()));
     connect(m_server->listenSocket, SIGNAL(newConnection()), m_server, SLOT(closeListen()));
-//    connect(m_server->readWriteSocket, SIGNAL(connected()), this, SLOT(setGobang()));
+
 }
 
 MainWindow::~MainWindow()
@@ -121,7 +112,6 @@ void MainWindow::setStart()
 
 void MainWindow::checkState()
 {
-    qDebug() << currentState;
     if(currentState == QAbstractSocket::ConnectedState &&
             m_server->readWriteSocket->state() == QAbstractSocket::UnconnectedState)
     {
@@ -177,7 +167,7 @@ void MainWindow::broadcast()
 {
     if(m_name.size() == 0)
     {
-        if(m_waitWidget->ui->nameEdit->text() != "")
+        if(m_waitWidget->ui->nameEdit->text() != "" && !m_waitWidget->ui->nameEdit->text().contains(" "))
             m_name = m_waitWidget->ui->nameEdit->text();
         else
             m_name = "Unamed";
